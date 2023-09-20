@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<div id="app">
+    <form>
+        <fieldset>
+            <legend>Username:</legend>
+            <input v-model="name"/>
+        </fieldset>
+        <fieldset>
+            <legend>Password:</legend>
+            <input v-model="pas" />
+        </fieldset>
+        <button v-on:click="checkLogin" type="button">Register</button>
+    </form>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script type="application/javascript">
+
+    const {createApp, ref} = Vue
+
+    createApp({
+        setup() {
+            return {
+                name: ref(''),
+                pas: ref(''),
+                persons: ref([]),
+                // auth: ref(false)
+            }
+        },
+        methods:{
+            async checkLogin() {
+                const username = this.name;
+                const pass = this.pas;
+                let auth = false;
+                let obj = [];
+
+                const response = await fetch('/json/logins.json');
+                const users = await response.json();
+
+                // console.log(users);
+                if (Array.isArray(users)){
+                    users.map(user => {
+                        if (user.username === username && user.password === pass){
+                            auth = true;
+                            obj.push({name: user.username, passw: user.password});
+                        }
+                    });
+                }
+
+                if (auth){
+                    alert(JSON.stringify(obj) + ' Logged In')
+                } else {
+                    console.log('nope')
+                }
+            }
+        }
+    }).mount('#app')
+
+</script>
+
+</body>
+</html>
