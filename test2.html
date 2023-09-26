@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <div id="app">
+        <form>
+            <fieldset>
+                <legend>Name(s):</legend>
+                <input v-model="name"/>
+            </fieldset>
+            <fieldset>
+                <legend>Last Name:</legend>
+                <input v-model="lastName" />
+            </fieldset>
+            <button v-on:click="savePerson" type="button">Save Me</button>
+        </form>
+
+        <div>
+            <ul v-for="p in persons">
+                <li>{{ p.name + " " + p.lastname }}</li>
+            </ul>
+        </div>
+    </div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script type="application/javascript">
+
+    const {createApp, ref} = Vue
+
+    createApp({
+        setup() {
+            return {
+                count: ref(0),
+                name: ref(''),
+                lastName: ref(''),
+                persons: ref([])
+            }
+        },
+        methods:{
+            savePerson(){
+                let people = { name: this.name, lastname: this.lastName }
+                this.persons.push(people)
+            }
+        }
+    }).mount('#app')
+
+</script>
+
+</body>
+</html>

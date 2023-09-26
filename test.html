@@ -1,0 +1,50 @@
+<style>
+    button{
+        border-radius: 4px;
+    }
+    input{
+        display: block;
+    }
+</style>
+
+<div id="app">
+    <div>
+        <button v-on:click="counter">Counter {{ count }}</button>
+    </div>
+    <br/>
+    <div>
+        <input v-model="text">
+        <p>Hola {{ text }}</p>
+    </div>
+    <br/>
+    <div>
+        <input v-model="num1"/>
+        <input v-model="num2"/>
+        <button v-on:click="suma">Suma</button>
+        <p v-if="result > 0">Resultado: {{ result }}</p>
+    </div>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                count: 0,
+                text: '',
+                num1:0,
+                num2:0,
+                result:0
+            }
+        },
+        methods: {
+            counter() {
+                this.count += 1
+            },
+            suma(){
+                this.result = parseInt(this.num1) + parseInt(this.num2)
+            }
+        }
+    })
+    app.mount('#app')
+</script>
