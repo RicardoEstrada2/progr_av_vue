@@ -28,32 +28,14 @@
             <legend>Password:</legend>
             <input v-model="pas" />
         </fieldset>
-        <button v-on:click="checkLogin" type="button">Register</button>
+        <button v-on:click="checkLogin" type="button">Log In</button>
     </form>
 
     <div v-if="authent">
         <div>
             <button v-on:click="logOut">Log Out</button>
         </div>
-        <div>
-            <label>
-                name
-                <input v-model="newName" />
-            </label>
-            <label>
-                lastname
-                <input v-model="newLastName" />
-            </label>
-            <label>
-                username
-                <input v-model="newUserName" />
-            </label>
-            <label>
-                email
-                <input v-model="newEmail" />
-            </label>
-            <button v-on:click="addUser">add</button>
-        </div>
+
         <table>
             <thead>
             <tr>
@@ -71,11 +53,39 @@
                 <td>{{user.username}}</td>
                 <td>{{user.email}}</td>
                 <td>
+                    <button @click="editUser(user, index)" type="button">Edit</button>
                     <button @click="deleteUser(index)" type="button">Delete</button>
                 </td>
             </tr>
             </tbody>
         </table>
+
+        <div>
+            <div v-if="!addUserButton && !editUserButton">
+                <button v-on:click="addUserButtonMethod">Add User</button>
+            </div>
+            <div v-if="addUserButton || editUserButton">
+                <label>
+                    name
+                    <input v-model="newName" />
+                </label>
+                <label>
+                    lastname
+                    <input v-model="newLastName" />
+                </label>
+                <label>
+                    username
+                    <input v-model="newUserName" />
+                </label>
+                <label>
+                    email
+                    <input v-model="newEmail" />
+                </label>
+                <button v-on:click="addUser" v-if="addUserButton">add</button>
+                <button v-on:click="saveEdittedUser" v-if="editUserButton">save</button>
+                <button v-on:click="closeDiv">x</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -96,7 +106,10 @@
                 newUserName: ref(''),
                 newEmail: ref(''),
                 persons: ref([]),
-                authent: ref(false)
+                authent: ref(false),
+                tempIndex: ref(''),
+                addUserButton: ref(false),
+                editUserButton: ref(false)
             }
         },
         methods:{
@@ -137,15 +150,36 @@
             },
             addUser(){
                 this.persons.push({"firstName": this.newName, "lastName": this.newLastName,"username": this.newUserName, "email": this.newEmail});
-                this.newName = '';
-                this.newLastName = '';
-                this.newUserName = '';
-                this.newEmail = '';
+                this.addUserButtonMethod()
                 console.log(this.persons);
             },
             deleteUser: function(index){
                 console.log(index);
                 this.persons.splice(index, 1);
+            },
+            editUser: function(user, index){
+                this.newName = user.firstName;
+                this.newLastName = user.lastName;
+                this.newEmail = user.email;
+                this.newUserName = user.username;
+                this.tempIndex = index;
+
+                this.editUserButton = !this.editUserButton;
+            },
+            saveEdittedUser(){
+                this.persons[this.tempIndex] = {"firstName": this.newName, "lastName": this.newLastName,"username": this.newUserName, "email": this.newEmail};
+                this.editUserButton = !this.editUserButton;
+            },
+            addUserButtonMethod(){
+                this.addUserButton = !this.addUserButton;
+                this.newName = '';
+                this.newLastName = '';
+                this.newUserName = '';
+                this.newEmail = '';
+            },
+            closeDiv(){
+                this.addUserButton = false;
+                this.editUserButton = false;
             }
         },
         mounted(){
