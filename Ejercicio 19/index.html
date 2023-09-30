@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body{
+            padding: 0;
+            margin: 0;
+        }
+        #app{
+            background-color: #3f3c3c;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form-container{
+             background-color: #FFFFFF;
+             padding: 50px 20px;
+            border-radius: 10px;
+         }
+        .form-container h2{
+            padding: 0;
+            margin: 0;
+            padding-bottom: 20px;
+        }
+        .form-container form{
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+        }
+        input{
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="form-container">
+        <h2>Login</h2>
+        <form @submit="submitForm">
+            <input type="text" v-model="username" placeholder="Username">
+            <input type="password" v-model="password" placeholder="Password">
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script type="application/javascript">
+
+    const {createApp, ref} = Vue
+
+
+    createApp({
+        setup() {
+            // window.location.reload();
+
+            return {
+                username: ref(''),
+                password: ref(''),
+                apiKey: ref('45e22b2c11e62b1f9a6b97f12c2fbfb4'),
+                data: ref({}),
+                isLogged: ref(false)
+            }
+        },
+        methods:{
+            async submitForm(e) {
+                e.preventDefault();
+                const requestToken = await this.createRequestToken();
+                const validated = await this.validateWithLogin(requestToken);
+                if (validated) {
+                    const sessionId = await this.createSession(requestToken);
+                    // console.log(sessionId);
+                    sessionStorage.setItem('sessionId', sessionId);
+                    window.location.href = 'movies.html';
+                }
+            },
+            async createRequestToken() {
+                const response = await fetch(`https://api.themoviedb.org/3/authentication/token/new?api_key=${this.apiKey}`);
+                const data = await response.json();
+                return data.request_token;
+            },
+            async validateWithLogin(requestToken) {
+                const response = await fetch(`https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${this.apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: this.username,
+                        password: this.password,
+                        request_token: requestToken
+                    })
+                });
+                const data = await response.json();
+                return data.success;
+            },
+            async createSession(requestToken) {
+                const response = await fetch(`https://api.themoviedb.org/3/authentication/session/new?api_key=${this.apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        request_token: requestToken
+                    })
+                });
+                const data = await response.json();
+                return data.session_id;
+            },
+            checkSession() {
+                const sessionId = sessionStorage.getItem('sessionId');
+                if (sessionId) {
+                    // Session exists, redirect to movies page
+                    window.location.href = 'movies.html';
+                }
+            }
+        },
+        created() {
+            this.checkSession();
+        },
+    }).mount('#app')
+
+</script>
+
+</body>
+</html>
